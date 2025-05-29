@@ -70,6 +70,21 @@ class Scanner {
                 if(match('/')){
                     // A comment goes till the end of the line
                     while(peek() != '\n' && !isAtEnd()) advance();
+                }else if(match('*')){
+                    boolean endCheck = false;
+                    while(peek() != '*' || peekNext() != '/'){
+                        if(isAtNextEnd()){
+                            endCheck = true;
+                            break;
+                        }
+                        advance();
+                    }
+                    if(endCheck){
+                        Lox.error(line, "Unending Comment");
+                        System.exit(0);
+                    }
+                    advance();
+                    advance();
                 }else{
                     addToken(SLASH);
                 }
@@ -122,6 +137,10 @@ class Scanner {
 
     private boolean isAtEnd() {
         return current >= source.length();
+    }
+
+    private boolean isAtNextEnd() {
+        return current + 2 >= source.length();
     }
 
     private char advance(){
